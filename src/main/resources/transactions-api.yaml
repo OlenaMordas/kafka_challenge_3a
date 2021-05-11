@@ -1,0 +1,85 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: Microservices training coding challenge
+
+
+tags:
+  - name: "Transactions"
+
+paths:
+  /transactions:
+    get:
+      tags:
+        - "Transactions"
+      operationId: getTransactions
+      parameters:
+        - in: query
+          name: accountId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: month
+          description: month in which transaction were made
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          description: offset from which the listed transactions begin
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          description: number transactions shown on page
+          schema:
+            type: integer
+            default: 100
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionPage"
+        "401":
+          description: "Unauthorised"
+        "400":
+          description: "Bad request"
+        "500":
+          description: "Server error"
+
+components:
+  schemas:
+    Transaction:
+      properties:
+        id:
+          type: string
+        account_id:
+          type: number
+        amount:
+          type: string
+        iban:
+          type: string
+        valueDate:
+          type: string
+        desription:
+          type: string
+    TransactionPage:
+      properties:
+        debit:
+          type: number
+        credit:
+          type: number
+        exchangeRate:
+          type: number
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        transactionCount:
+          type: number
+        offset:
+          type: number
