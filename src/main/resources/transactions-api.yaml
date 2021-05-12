@@ -57,7 +57,7 @@ components:
       properties:
         id:
           type: string
-        account_id:
+        accountId:
           type: number
         amount:
           type: string
@@ -65,7 +65,7 @@ components:
           type: string
         valueDate:
           type: string
-        desription:
+        description:
           type: string
     TransactionPage:
       properties:
