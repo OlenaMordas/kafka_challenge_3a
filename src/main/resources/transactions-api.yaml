@@ -75,6 +75,10 @@ components:
           type: number
         exchangeRate:
           type: number
+        debitExchanged:
+          type: number
+        creditExchanged:
+          type: number
         transactions:
           type: array
           items:
