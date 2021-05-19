@@ -20,9 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequiredArgsConstructor
-@Log4j2
 public class TransactionController implements TransactionsApi {
-
 
     private final TransactionService transactionService;
 
