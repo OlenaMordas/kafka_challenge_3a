@@ -6,6 +6,7 @@ import com.example.kafka_challenge_3a.models.Transaction;
 import com.example.kafka_challenge_3a.models.TransactionPage;
 import com.example.kafka_challenge_3a.repository.TransactionRepository;
 import com.example.kafka_challenge_3a.utils.CurrencyUtilService;
+import com.example.kafka_challenge_3a.utils.InvalidAccountNumberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -67,7 +68,8 @@ public class TransactionService {
         try {
             transactionEntities = transactionRepository.findByClientAccountNumber(clientAccountNumber, limit, offset, month);
         } catch (Exception e) {
-            throw new Exception(String.format("There are no values of transactions for the given account number. Response: %s", e.toString()));
+            throw new InvalidAccountNumberException(
+                    String.format("There are no values of transactions for the given account number %1$s. Response: %2$s", clientAccountNumber, e.toString()));
         }
 
         for (TransactionEntity te : transactionEntities) {

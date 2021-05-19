@@ -46,7 +46,7 @@ public class CurrencyUtilService {
                 return  currencies.getRates().get("CHF");
 
         }
-        throw new Exception(String.format("Invalid currency: %s", currency));
+        throw new InvalidCurrencyException(String.format("Invalid currency: %s", currency));
     }
 
     private void fetchCurrenciesFromApi() throws Exception {
