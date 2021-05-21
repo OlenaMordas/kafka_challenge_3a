@@ -6,10 +6,8 @@ import com.example.kafka_challenge_3a.models.Transaction;
 import com.example.kafka_challenge_3a.models.TransactionPage;
 import com.example.kafka_challenge_3a.repository.TransactionRepository;
 import com.example.kafka_challenge_3a.utils.CurrencyUtilService;
-import com.example.kafka_challenge_3a.utils.InvalidAccountNumberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -30,15 +27,36 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    @Async
-    public CompletableFuture<TransactionPage> getTransactionPage(long clientAccountNumber, int month, Integer offset, Integer limit) throws Exception {
+
+    public TransactionPage getTransactionPage(long clientAccountNumber, int month, Integer offset, Integer limit) throws Exception {
 
 
         TransactionPage transactionPage = new TransactionPage();
         setTransactionEntities(transactionPage,clientAccountNumber,month,offset,limit);
         setTransactionPageProperties(transactionPage,offset);
 
-        return CompletableFuture.completedFuture(transactionPage);
+        return transactionPage;
+    }
+
+    private void setTransactionEntities(TransactionPage transactionPage,
+                                        long clientAccountNumber,
+                                        int month,
+                                        Integer offset,
+                                        Integer limit ) throws Exception {
+        List<TransactionEntity> transactionEntities;
+        List<Transaction> transactions = new ArrayList();
+        transactionEntities = transactionRepository.findByClientAccountNumber(clientAccountNumber, limit, offset, month);
+
+
+        for (TransactionEntity te : transactionEntities) {
+            transactions.add(TransactionMapper.INSTANCE.mapTo(te));
+        }
+
+        try {
+            transactionPage.setTransactions(transactions);
+        } catch (Exception e) {
+            throw new Exception(String.format("Error setting Transaction Page properties: %s", e.toString()));
+        }
     }
 
     private void setTransactionPageProperties(TransactionPage transactionPage, Integer offset) throws Exception {
@@ -58,30 +76,6 @@ public class TransactionService {
         }
     }
 
-    private void setTransactionEntities(TransactionPage transactionPage,
-                                        long clientAccountNumber,
-                                        int month,
-                                        Integer offset,
-                                        Integer limit ) throws Exception {
-        List<TransactionEntity> transactionEntities;
-        List<Transaction> transactions = new ArrayList();
-        try {
-            transactionEntities = transactionRepository.findByClientAccountNumber(clientAccountNumber, limit, offset, month);
-        } catch (Exception e) {
-            throw new InvalidAccountNumberException(
-                    String.format("There are no values of transactions for the given account number %1$s. Response: %2$s", clientAccountNumber, e.toString()));
-        }
-
-        for (TransactionEntity te : transactionEntities) {
-            transactions.add(TransactionMapper.INSTANCE.mapTo(te));
-        }
-
-        try {
-            transactionPage.setTransactions(transactions);
-        } catch (Exception e) {
-            throw new Exception(String.format("Error setting Transaction Page properties: %s", e.toString()));
-        }
-    }
     private Map<String, BigDecimal> getDebitCredit(List<Transaction> transactions) {
         double creditSum = 0;
         double debitSum = 0;
