@@ -1,7 +1,6 @@
 package com.example.kafka_challenge_3a.intg.controller;
 
 import com.example.kafka_challenge_3a.api.TransactionsApi;
-import com.example.kafka_challenge_3a.models.Transaction;
 import com.example.kafka_challenge_3a.models.TransactionPage;
 import com.example.kafka_challenge_3a.service.TransactionService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Controller;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequiredArgsConstructor
