@@ -1,0 +1,42 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:latest
+    networks:
+      - kafka-app-net
+    container_name: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=P@ssw0rd
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=POSTGRESQL
+    restart: unless-stopped
+  # APP*****************************************
+  api_app:
+    build:
+      context: .
+    networks:
+      - kafka-app-net
+    container_name: api_app
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    links:
+      - postgres
+volumes:
+  postgres-data:
+networks:
+  kafka-app-net:
+    # use the bridge driver, but enable IPv6
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
