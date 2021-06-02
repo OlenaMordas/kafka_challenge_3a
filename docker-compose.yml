@@ -1,0 +1,57 @@
+version: "3"
+services:
+  db:
+    image: postgres:latest
+    networks:
+      - kafka-consumer-net
+    container_name: db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=P@ssw0rd
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=POSTGRESQL
+    restart: unless-stopped
+  # CONSUMER
+  consumer_app:
+    build:
+      context: ./consumer_a
+    networks:
+      - kafka-consumer-net
+    container_name: consumer_app
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      - db
+    links:
+      - db
+  # API_APP
+  api_app:
+    build:
+      context: ./kafka_challenge_3a
+    networks:
+      - kafka-consumer-net
+    container_name: api_app
+    expose:
+      - "8081"
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    depends_on:
+      - db
+      - consumer_app
+volumes:
+  db-data:
+networks:
+  kafka-consumer-net:
+    # use the bridge driver, but enable IPv6
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
